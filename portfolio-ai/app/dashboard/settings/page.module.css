@@ -1,0 +1,147 @@
+.section {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  margin: 0;
+}
+
+.profileContent {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.profileField {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.profileField:last-child {
+  border-bottom: none;
+}
+
+.profileLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #c9d1d9;
+  min-width: 120px;
+}
+
+.profileField span:last-child {
+  font-size: 0.875rem;
+  color: #8b949e;
+}
+
+.contactButton {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.contactButton:hover {
+  background: #30363d;
+}
+
+.dangerZone {
+  margin-top: 2rem;
+  border-top: 1px solid #30363d;
+  padding-top: 1rem;
+}
+
+.dangerTitle {
+  color: #f85149;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.dangerButton {
+  background: #da3633;
+  color: #ffffff;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 6px;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dangerButton:hover {
+  background: #f85149;
+}
+
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmText {
+  color: #f85149;
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cancelButton {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancelButton:hover {
+  background: #30363d;
+}
+
+.deleteButton {
+  background: #da3633;
+  color: #ffffff;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 6px;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.deleteButton:hover {
+  background: #f85149;
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

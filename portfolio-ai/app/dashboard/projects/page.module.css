@@ -1,0 +1,804 @@
+.container {
+  min-height: 100vh;
+  background: #0d1117;
+}
+
+.contentWrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.section {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 0.75rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.sectionHeaderLeft {
+  display: flex;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.titleIcon {
+  margin-right: 0.5rem;
+  color: #8b949e;
+}
+
+.sectionSubtitle {
+  color: #8b949e;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  color: #8b949e;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.iconButton:hover {
+  background: #30363d;
+  color: #c9d1d9;
+  border-color: #484f58;
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 0.5rem;
+  background: #30363d;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  color: #8b949e;
+  margin-left: 0.5rem;
+}
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #238636;
+  color: #ffffff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  transition: all 0.2s;
+}
+
+.createButton:hover {
+  background: #2ea043;
+  transform: translateY(-1px);
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.skeletonCard {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.skeletonLine {
+  background: #21262d;
+  border-radius: 0.25rem;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonTags {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.skeletonTag {
+  width: 60px;
+  height: 24px;
+  background: #21262d;
+  border-radius: 1rem;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.loadingState,
+.errorState,
+.emptyProjects {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #8b949e;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #30363d;
+  border-top-color: #58a6ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorIcon {
+  color: #f85149;
+  margin-bottom: 1rem;
+}
+
+.errorTitle {
+  color: #c9d1d9;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.errorText {
+  color: #8b949e;
+  margin-bottom: 1.5rem;
+}
+
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  color: #c9d1d9;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.retryButton:hover {
+  background: #30363d;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.emptyIllustration {
+  margin-bottom: 1.5rem;
+}
+
+.emptyFolderIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background: #0d1117;
+  border: 1px dashed #30363d;
+  border-radius: 0.75rem;
+  color: #484f58;
+}
+
+.emptyTitle {
+  color: #c9d1d9;
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.emptyDescription {
+  color: #8b949e;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.5;
+}
+
+.emptyCreateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  background: #238636;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 0.5rem;
+  color: white;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.emptyCreateButton:hover {
+  background: #2ea043;
+  transform: translateY(-1px);
+}
+
+.projectsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.projectCard {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.projectCard:hover {
+  border-color: #58a6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.projectCardAccent {
+  height: 3px;
+  background: linear-gradient(90deg, #238636, #58a6ff);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.projectCard:hover .projectCardAccent {
+  opacity: 1;
+}
+
+.projectCardBody {
+  padding: 1.25rem;
+}
+
+.projectCardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.projectIcon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #1f6feb33, #23863633);
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b949e;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.projectCard:hover .projectIcon {
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+
+.projectTitleBlock {
+  flex: 1;
+  min-width: 0;
+}
+
+.projectCardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #58a6ff;
+  margin: 0;
+  word-break: break-word;
+  transition: color 0.2s;
+}
+
+.projectCardTitle:hover {
+  text-decoration: underline;
+}
+
+.projectCardDescription {
+  font-size: 0.875rem;
+  color: #8b949e;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.techStackWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.techBadge {
+  background: #1f6feb22;
+  color: #58a6ff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #1f6feb33;
+  transition: all 0.2s;
+}
+
+.techBadge:hover {
+  background: #1f6feb33;
+  border-color: #58a6ff;
+}
+
+.projectCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #21262d;
+}
+
+.projectLinks {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.projectLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #8b949e;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.projectLink:hover {
+  color: #58a6ff;
+}
+
+.deleteButton {
+  background: none;
+  border: 1px solid transparent;
+  color: #484f58;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 0.35rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.deleteButton:hover {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.15);
+  border-color: rgba(248, 81, 73, 0.3);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(248, 81, 73, 0.15);
+  border: 1px solid rgba(248, 81, 73, 0.4);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  color: #f85149;
+  font-size: 0.9rem;
+}
+
+.errorClose {
+  background: none;
+  border: none;
+  color: #f85149;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0 0.25rem;
+  opacity: 0.7;
+}
+
+.errorClose:hover {
+  opacity: 1;
+}
+
+.successBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(35, 134, 54, 0.15);
+  border: 1px solid rgba(35, 134, 54, 0.4);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  color: #2ea043;
+  font-size: 0.9rem;
+}
+
+.spinnerSmall {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(46, 160, 67, 0.3);
+  border-top-color: #2ea043;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.formLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c9d1d9;
+}
+
+.required {
+  color: #f85149;
+}
+
+.formHint {
+  font-size: 0.8rem;
+  color: #484f58;
+  margin-top: 0.25rem;
+}
+
+.inputWithIcon {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.inputWithIcon .formInput {
+  padding-left: 2.5rem;
+}
+
+.formInput {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  color: #c9d1d9;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+}
+
+.formInput::placeholder {
+  color: #484f58;
+}
+
+.formInput:disabled,
+.formTextarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formTextarea {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  color: #c9d1d9;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s;
+}
+
+.formTextarea:focus {
+  outline: none;
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+}
+
+.formTextarea::placeholder {
+  color: #484f58;
+}
+
+.techInputWrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.techAddButton {
+  padding: 0.65rem 1rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  color: #c9d1d9;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.techAddButton:hover {
+  background: #30363d;
+  border-color: #484f58;
+}
+
+.techStackForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.techBadgeForm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #1f6feb22;
+  color: #58a6ff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #1f6feb33;
+}
+
+.techRemoveButton {
+  background: none;
+  border: none;
+  color: #58a6ff;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.techRemoveButton:hover {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.15);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #21262d;
+}
+
+.cancelButton {
+  padding: 0.6rem 1.25rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  color: #c9d1d9;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background: #30363d;
+  border-color: #484f58;
+}
+
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: #238636;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #8b949e;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+  padding: 0.4rem 0.75rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  margin-right: 0.75rem;
+}
+
+.backButton:hover {
+  color: #c9d1d9;
+  background: #30363d;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 1rem;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .headerActions {
+    width: 100%;
+  }
+
+  .createButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .projectsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .techInputWrapper {
+    flex-direction: column;
+  }
+
+  .techAddButton {
+    width: 100%;
+  }
+
+  .skeletonGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 0.75rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.25rem;
+  }
+
+  .projectCardBody {
+    padding: 1rem;
+  }
+
+  .formContainer {
+    gap: 1rem;
+  }
+
+  .formInput,
+  .formTextarea {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .techBadgeForm {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .loadingState,
+  .errorState,
+  .emptyProjects {
+    padding: 2.5rem 1rem;
+  }
+
+  .emptyState {
+    padding: 3rem 1rem;
+  }
+}
