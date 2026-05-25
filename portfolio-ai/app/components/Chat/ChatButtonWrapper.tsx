@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 
 const ChatButton = dynamic(() => import('./ChatButton'), {
   ssr: false,
-  loading: () => <button className="contactButton">💬 Загрузка...</button>
+  loading: () => <button className="contactButton"> Загрузка...</button>
 })
 
 interface ChatButtonWrapperProps {

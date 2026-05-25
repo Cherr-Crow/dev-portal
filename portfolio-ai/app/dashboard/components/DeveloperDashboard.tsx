@@ -1,3 +1,4 @@
+// app/dashboard/components/DeveloperDashboard.tsx
 'use client'
 
 import Link from 'next/link'
@@ -10,6 +11,13 @@ interface DeveloperDashboardProps {
 export default function DeveloperDashboard({ user }: DeveloperDashboardProps) {
   return (
     <div>
+      {/* Кнопка перехода в чаты - ТАКАЯ ЖЕ КАК У РАБОТОДАТЕЛЯ */}
+      <div className={styles.chatNavButton}>
+        <Link href="/dashboard/chats" className={styles.allChatsButton}>
+          💬 Все чаты
+        </Link>
+      </div>
+
       {/* Профиль */}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
@@ -68,30 +76,39 @@ export default function DeveloperDashboard({ user }: DeveloperDashboardProps) {
           <div className={styles.projectsGrid}>
             {user.projects.map((project: any) => (
               <div key={project.id} className={styles.projectCard}>
-                <h3 className={styles.projectTitle}>{project.title}</h3>
-                <p className={styles.projectDescription}>{project.description}</p>
-                <div className={styles.projectLinks}>
-                  {project.demoUrl && <a href={project.demoUrl} target="_blank" className={styles.projectLink}>Демо</a>}
-                  {project.repoUrl && <a href={project.repoUrl} target="_blank" className={styles.projectLink}>Репозиторий</a>}
+                <div className={styles.projectCardHeader}>
+                  <div className={styles.projectIcon}>📁</div>
+                  <h3 className={styles.projectCardTitle}>{project.title}</h3>
+                </div>
+                <p className={styles.projectCardDescription}>{project.description}</p>
+                {project.techStack && (
+                  <div className={styles.techStack}>
+                    {(() => {
+                      try {
+                        return JSON.parse(project.techStack).map((tech: string) => (
+                          <span key={tech} className={styles.techBadge}>{tech}</span>
+                        ))
+                      } catch {
+                        return null
+                      }
+                    })()}
+                  </div>
+                )}
+                <div className={styles.projectCardFooter}>
+                  <div className={styles.projectLinks}>
+                    {project.demoUrl && <a href={project.demoUrl} target="_blank" className={styles.projectLink}>Демо</a>}
+                    {project.repoUrl && <a href={project.repoUrl} target="_blank" className={styles.projectLink}>Репозиторий</a>}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
           <div className={styles.emptyProjects}>
+            <div className={styles.emptyIcon}>📁</div>
             <p className={styles.emptyText}>У вас пока нет проектов</p>
           </div>
         )}
-      </section>
-
-      {/* Чаты */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Чаты</h2>
-        </div>
-        <div className={styles.profileContent}>
-          <p>Загрузка чатов...</p>
-        </div>
       </section>
     </div>
   )

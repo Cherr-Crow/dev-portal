@@ -1,13 +1,9 @@
+// app/components/Chat/ChatButton.tsx
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
 import styles from './Chat.module.css'
-
-const ChatWindow = dynamic(() => import('./ChatWindow'), {
-  loading: () => <div className={styles.loadingChat}>Загрузка...</div>,
-  ssr: false
-})
 
 interface ChatButtonProps {
   developerId: string
@@ -15,23 +11,11 @@ interface ChatButtonProps {
   currentUserId: string
 }
 
-interface ChatData {
-  chat: {
-    id: string
-  }
-}
-
 export default function ChatButton({ developerId, developerName, currentUserId }: ChatButtonProps) {
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false)
-  const [chatId, setChatId] = useState<string | null>(null)
-  const [loading, setLoading] = useState<boolean>(false)
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
-  const openChat = async (): Promise<void> => {
-    if (chatId) {
-      setIsChatOpen(true)
-      return
-    }
-
+  const openChat = async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/chat/get-or-create', {
@@ -40,13 +24,11 @@ export default function ChatButton({ developerId, developerName, currentUserId }
         body: JSON.stringify({ developerId })
       })
       
-      if (!res.ok) {
-        throw new Error('Failed to create chat')
-      }
+      if (!res.ok) throw new Error('Failed to create chat')
       
-      const data: ChatData = await res.json()
-      setChatId(data.chat.id)
-      setIsChatOpen(true)
+      const data = await res.json()
+      // Переходим на страницу чатов с выбранным чатом
+      router.push(`/dashboard/chats?chatId=${data.chat.id}&userName=${encodeURIComponent(developerName)}&userId=${developerId}`)
     } catch (error) {
       console.error('Error opening chat:', error)
       alert('Не удалось открыть чат')
@@ -56,19 +38,8 @@ export default function ChatButton({ developerId, developerName, currentUserId }
   }
 
   return (
-    <>
-      <button onClick={openChat} disabled={loading} className={styles.contactButton}>
-        {loading ? '⏳' : 'Связаться'}
-      </button>
-
-      {isChatOpen && chatId && (
-        <ChatWindow
-          chatId={chatId}
-          otherUserName={developerName}
-          currentUserId={currentUserId}
-          onClose={() => setIsChatOpen(false)}
-        />
-      )}
-    </>
+    <button onClick={openChat} disabled={loading} className={styles.contactButton}>
+      {loading ? '' : ' Связаться'}
+    </button>
   )
 }

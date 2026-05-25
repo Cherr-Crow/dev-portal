@@ -1,7 +1,9 @@
+// app/dashboard/components/EmployerDashboard.tsx
 'use client'
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import styles from '../page.module.css'
 
 const ChatButton = dynamic(() => import('@/app/components/Chat/ChatButton'), {
@@ -54,6 +56,13 @@ export default function EmployerDashboard({ user, initialDevelopers, searchQuery
 
   return (
     <div>
+      {/* Кнопка перехода в чаты */}
+      <div className={styles.chatNavButton}>
+        <Link href="/dashboard/chats" className={styles.allChatsButton}>
+           Все чаты
+        </Link>
+      </div>
+
       <section className={styles.searchSection}>
         <h2 className={styles.sectionTitle}>Поиск разработчиков</h2>
         <input
@@ -89,7 +98,7 @@ export default function EmployerDashboard({ user, initialDevelopers, searchQuery
                 
                 <div className={styles.developerInfo}>
                   <p className={styles.developerLocation}>
-                     {developer.profile?.location || 'Локация не указана'}
+                    📍 {developer.profile?.location || 'Локация не указана'}
                   </p>
                   {developer.profile?.bio && (
                     <p className={styles.developerBio}>{developer.profile.bio}</p>

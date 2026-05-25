@@ -1,15 +1,8 @@
+// app/components/Chat/ChatWindow.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import type { MessageWithSender } from '@/app/types'
 import styles from './Chat.module.css'
-
-interface ChatWindowProps {
-  chatId: string
-  otherUserName: string
-  currentUserId: string
-  onClose: () => void
-}
 
 interface Message {
   id: string
@@ -23,12 +16,14 @@ interface Message {
   }
 }
 
-export default function ChatWindow({ 
-  chatId, 
-  otherUserName, 
-  currentUserId, 
-  onClose 
-}: ChatWindowProps) {
+interface ChatWindowProps {
+  chatId: string
+  otherUserName: string
+  currentUserId: string
+  onBack?: () => void
+}
+
+export default function ChatWindow({ chatId, otherUserName, currentUserId, onBack }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
@@ -36,7 +31,7 @@ export default function ChatWindow({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const loadMessages = async (): Promise<void> => {
+  const loadMessages = async () => {
     try {
       const res = await fetch(`/api/chat/messages?chatId=${chatId}`)
       if (!res.ok) throw new Error('Failed to load messages')
@@ -51,13 +46,9 @@ export default function ChatWindow({
 
   useEffect(() => {
     loadMessages()
-    
     pollingIntervalRef.current = setInterval(loadMessages, 3000)
-    
     return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current)
-      }
+      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current)
     }
   }, [chatId])
 
@@ -65,7 +56,7 @@ export default function ChatWindow({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newMessage.trim() || sending) return
 
@@ -76,42 +67,40 @@ export default function ChatWindow({
     try {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'  // ← исправлено: добавлены кавычки
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chatId, content: messageContent })
       })
       
       if (!res.ok) throw new Error('Failed to send message')
-      
       await loadMessages()
     } catch (error) {
       console.error('Error sending message:', error)
       setNewMessage(messageContent)
-      alert('Не удалось отправить сообщение. Попробуйте еще раз.')
+      alert('Не удалось отправить сообщение')
     } finally {
       setSending(false)
     }
   }
 
-  const formatTime = (dateString: string): string => {
+  const formatTime = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
     
     if (date.toDateString() === now.toDateString()) {
       return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
     }
-    if (date.getFullYear() === now.getFullYear()) {
-      return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
-    }
-    return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' })
+    return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
   }
 
   return (
-    <div className={styles.chatWindow}>
+    <div className={styles.chatWindowFull}>
       <div className={styles.chatHeader}>
+        {onBack && (
+          <button onClick={onBack} className={styles.backButton}>
+            ←
+          </button>
+        )}
         <h3>Чат с {otherUserName}</h3>
-        <button onClick={onClose} className={styles.closeButton}>×</button>
       </div>
       
       <div className={styles.messagesArea}>
@@ -124,14 +113,10 @@ export default function ChatWindow({
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`${styles.message} ${
-                  msg.senderId === currentUserId ? styles.sent : styles.received
-                }`}
+                className={`${styles.message} ${msg.senderId === currentUserId ? styles.sent : styles.received}`}
               >
                 <div className={styles.messageContent}>{msg.content}</div>
-                <div className={styles.messageTime}>
-                  {formatTime(msg.createdAt)}
-                </div>
+                <div className={styles.messageTime}>{formatTime(msg.createdAt)}</div>
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -143,7 +128,7 @@ export default function ChatWindow({
         <input
           type="text"
           value={newMessage}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewMessage(e.target.value)}
+          onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Введите сообщение..."
           className={styles.messageInput}
           disabled={sending}

@@ -37,15 +37,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const isDeveloper = session.user.role === 'DEVELOPER'
 
   const navItems = [
-    { href: '/dashboard', icon: '📊', label: 'Обзор' },
+    { href: '/dashboard', icon: '', label: 'Обзор' },
     ...(isDeveloper ? [
-      { href: '/dashboard/profile', icon: '👤', label: 'Профиль' },
-      { href: '/dashboard/projects', icon: '📁', label: 'Проекты' },
+      { href: '/dashboard/profile', icon: '', label: 'Профиль' },
+      { href: '/dashboard/projects', icon: '', label: 'Проекты' },
     ] : [
-      { href: '/dashboard/developers', icon: '👥', label: 'Разработчики' },
+      { href: '/dashboard/developers', icon: '', label: 'Разработчики' },
     ]),
-    { href: '/dashboard/messages', icon: '💬', label: 'Сообщения' },
-    { href: '/dashboard/settings', icon: '⚙️', label: 'Настройки' },
+    { href: '/dashboard/messages', icon: '', label: 'Сообщения' },
+    { href: '/dashboard/settings', icon: '', label: 'Настройки' },
   ]
 
   return (

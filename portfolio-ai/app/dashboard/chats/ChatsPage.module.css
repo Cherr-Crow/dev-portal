@@ -1,0 +1,130 @@
+/* app/dashboard/chats/ChatsPage.module.css */
+
+.chatsPage {
+  display: flex;
+  height: calc(100vh - 80px);
+  background: #0d1117;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #30363d;
+}
+
+.chatListPanel {
+  width: 320px;
+  background: #161b22;
+  border-right: 1px solid #30363d;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #161b22;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c9d1d9;
+}
+
+.dashboardLink {
+  padding: 0.35rem 0.75rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #c9d1d9;
+  transition: all 0.2s;
+}
+
+.dashboardLink:hover {
+  background: #30363d;
+  color: #ffffff;
+}
+
+.chatPanel {
+  flex: 1;
+  background: #0d1117;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Стиль для сообщения, когда нет чатов (вместо "Выберите чат") */
+.noChatsMessage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #8b949e;
+  text-align: center;
+}
+
+.noChatIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.noChatsMessage h3 {
+  margin: 0 0 0.5rem 0;
+  color: #c9d1d9;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.noChatsMessage p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #8b949e;
+  font-size: 0.875rem;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .chatsPage {
+    flex-direction: column;
+    height: calc(100vh - 60px);
+  }
+
+  .chatListPanel {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .chatPanel {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+  }
+
+  .panelHeader {
+    padding: 0.75rem 1rem;
+  }
+}

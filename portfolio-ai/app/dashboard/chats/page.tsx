@@ -1,11 +1,11 @@
-// app/dashboard/messages/page.tsx
+// app/dashboard/chats/page.tsx
 'use client'
 
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import styles from './page.module.css'
+import styles from './ChatsPage.module.css'
 
 const ChatList = dynamic(() => import('@/app/components/Chat/ChatList'), {
   ssr: false,
@@ -17,19 +17,19 @@ const ChatWindow = dynamic(() => import('@/app/components/Chat/ChatWindow'), {
   loading: () => <div className={styles.loading}>Загрузка чата...</div>
 })
 
-export default function MessagesPage() {
+export default function ChatsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [autoSelected, setAutoSelected] = useState(false)
+  const [chatsLoaded, setChatsLoaded] = useState(false)
   
-  let chatId = searchParams.get('chatId')
-  let userName = searchParams.get('userName')
+  const chatId = searchParams.get('chatId')
+  const userName = searchParams.get('userName')
 
-  // Автоматически выбираем первый чат при загрузке
+  // Автоматически выбираем первый чат, если нет выбранного
   useEffect(() => {
     const autoSelectFirstChat = async () => {
-      if (!session?.user?.id || chatId || autoSelected) return
+      if (!session?.user?.id || chatId || chatsLoaded) return
       
       try {
         const res = await fetch('/api/chat/list')
@@ -37,21 +37,20 @@ export default function MessagesPage() {
           const data = await res.json()
           if (data.chats && data.chats.length > 0) {
             const firstChat = data.chats[0]
-            // Обновляем URL без перезагрузки страницы
-            window.history.replaceState(null, '', `/dashboard/messages?chatId=${firstChat.id}&userName=${encodeURIComponent(firstChat.otherUser.name || firstChat.otherUser.email)}&userId=${firstChat.otherUser.id}`)
-            // Обновляем переменные
-            chatId = firstChat.id
-            userName = firstChat.otherUser.name || firstChat.otherUser.email
-            setAutoSelected(true)
+            router.replace(
+              `/dashboard/chats?chatId=${firstChat.id}&userName=${encodeURIComponent(firstChat.otherUser.name || firstChat.otherUser.email)}&userId=${firstChat.otherUser.id}`
+            )
           }
         }
       } catch (error) {
         console.error('Error auto-selecting chat:', error)
+      } finally {
+        setChatsLoaded(true)
       }
     }
     
     autoSelectFirstChat()
-  }, [session?.user?.id, chatId, autoSelected])
+  }, [session?.user?.id, chatId, router, chatsLoaded])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -67,17 +66,8 @@ export default function MessagesPage() {
     return null
   }
 
-  const handleBack = () => {
-    router.push('/dashboard/messages')
-  }
-
-  // Если есть чаты, но не выбран ни один (ждем авто-выбор)
-  if (!chatId && !autoSelected) {
-    return <div className={styles.loading}>Загрузка чатов...</div>
-  }
-
   return (
-    <div className={styles.messagesPage}>
+    <div className={styles.chatsPage}>
       {/* Левая панель - список чатов */}
       <div className={styles.chatListPanel}>
         <div className={styles.panelHeader}>
@@ -99,11 +89,12 @@ export default function MessagesPage() {
             chatId={chatId}
             otherUserName={decodeURIComponent(userName)}
             currentUserId={session.user.id}
-            onBack={handleBack}
+            onBack={() => router.push('/dashboard/chats')}
           />
         ) : (
-          <div className={styles.noChatSelected}>
-            <div className={styles.noChatIcon}></div>
+          // Показываем только если действительно нет чатов
+          <div className={styles.noChatsMessage}>
+            <div className={styles.noChatIcon}>💬</div>
             <h3>Нет чатов</h3>
             <p>Начните диалог с разработчиком или работодателем</p>
           </div>

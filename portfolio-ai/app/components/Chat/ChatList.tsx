@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import styles from './Chat.module.css'
 
 interface ChatUser {
@@ -25,11 +26,11 @@ interface Chat {
 
 interface ChatListProps {
   currentUserId: string
-  onSelectChat: (chatId: string, otherUser: ChatUser) => void
   selectedChatId?: string
 }
 
-export default function ChatList({ currentUserId, onSelectChat, selectedChatId }: ChatListProps) {
+export default function ChatList({ currentUserId, selectedChatId }: ChatListProps) {
+  const router = useRouter()
   const [chats, setChats] = useState<Chat[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -48,9 +49,13 @@ export default function ChatList({ currentUserId, onSelectChat, selectedChatId }
 
   useEffect(() => {
     loadChats()
-    const interval = setInterval(loadChats, 10000) // Обновляем каждые 10 секунд
+    const interval = setInterval(loadChats, 10000)
     return () => clearInterval(interval)
   }, [])
+
+  const handleSelectChat = (chatId: string, otherUser: ChatUser) => {
+    router.push(`/dashboard/chats?chatId=${chatId}&userName=${encodeURIComponent(otherUser.name || otherUser.email)}&userId=${otherUser.id}`)
+  }
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return ''
@@ -102,7 +107,7 @@ export default function ChatList({ currentUserId, onSelectChat, selectedChatId }
           <div
             key={chat.id}
             className={`${styles.chatListItem} ${selectedChatId === chat.id ? styles.active : ''}`}
-            onClick={() => onSelectChat(chat.id, chat.otherUser)}
+            onClick={() => handleSelectChat(chat.id, chat.otherUser)}
           >
             <div className={styles.chatAvatar}>
               {getRoleIcon(chat.otherUser.role)}
