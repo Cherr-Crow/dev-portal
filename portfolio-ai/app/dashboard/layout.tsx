@@ -17,7 +17,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     if (status === 'unauthenticated') router.push('/auth/signin')
   }, [status, router])
 
-  // Закрывать мобильное меню при смене страницы
   useEffect(() => {
     setSidebarOpen(false)
   }, [pathname])
@@ -42,9 +41,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       { href: '/dashboard/profile', icon: '', label: 'Профиль' },
       { href: '/dashboard/projects', icon: '', label: 'Проекты' },
     ] : [
-      { href: '/dashboard/developers', icon: '', label: 'Разработчики' },
+      
     ]),
-    { href: '/dashboard/messages', icon: '', label: 'Сообщения' },
+    { href: '/dashboard/chats', icon: '', label: 'Сообщения' },
     { href: '/dashboard/settings', icon: '', label: 'Настройки' },
   ]
 

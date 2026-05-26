@@ -137,8 +137,8 @@ export default function SignUpPage() {
                 cursor: 'pointer'
               }}
             >
-              <option value="DEVELOPER">👨‍💻 Создавать портфолио (Разработчик)</option>
-              <option value="EMPLOYER">🏢 Искать разработчиков (Работодатель)</option>
+              <option value="DEVELOPER">Создавать портфолио (Разработчик)</option>
+              <option value="EMPLOYER">Искать разработчиков (Работодатель)</option>
             </select>
           </div>
 
