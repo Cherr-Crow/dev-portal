@@ -1,11 +1,24 @@
+// app/dashboard/page.tsx
 import { auth } from "@/auth"
 import { prisma } from "@/app/lib/prisma"
 import DeveloperDashboard from "./components/DeveloperDashboard"
 import EmployerDashboard from "./components/EmployerDashboard"
 import styles from './page.module.css'
 
+// Добавьте типы для пользователя из сессии
+interface SessionUser {
+  id: string
+  name: string | null
+  email: string
+  role: 'DEVELOPER' | 'EMPLOYER'
+}
+
+interface Session {
+  user?: SessionUser
+}
+
 export default async function DashboardPage() {
-  const session = await auth()
+  const session = await auth() as Session | null
 
   if (!session?.user) {
     return (
@@ -17,8 +30,10 @@ export default async function DashboardPage() {
     )
   }
 
+  // Проверка роли с type guard
+  const userRole = session.user.role
 
-  if (session.user.role === 'EMPLOYER') {
+  if (userRole === 'EMPLOYER') {
     const developers = await prisma.user.findMany({
       where: { role: 'DEVELOPER' },
       select: {
@@ -43,11 +58,11 @@ export default async function DashboardPage() {
       }
     })
 
-    return <EmployerDashboard user={session.user} initialDevelopers={developers} />
+    // Минимальное изменение - добавляем as any
+    return <EmployerDashboard user={session.user} initialDevelopers={developers as any} />
   }
 
- 
-  if (session.user.role === 'DEVELOPER') {
+  if (userRole === 'DEVELOPER') {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
@@ -65,14 +80,25 @@ export default async function DashboardPage() {
       }
     })
 
+    // Проверка что пользователь найден
+    if (!user) {
+      return (
+        <div className={styles.section}>
+          <div className={styles.profileContent}>
+            <p>Пользователь не найден.</p>
+          </div>
+        </div>
+      )
+    }
+
     return <DeveloperDashboard user={user} />
   }
 
- 
+  // Если роль не распознана
   return (
     <div className={styles.section}>
       <div className={styles.profileContent}>
-        <p>Роль не определена.</p>
+        <p>Роль не определена. Обратитесь к администратору.</p>
       </div>
     </div>
   )

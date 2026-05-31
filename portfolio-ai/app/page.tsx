@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import styles from './page.module.css'
 
 interface Project {
@@ -34,18 +34,18 @@ interface Developer {
 
 type Page = 'home' | 'projects' | 'developers'
 
-// Анимационные варианты
-const fadeInUp = {
+// Анимационные варианты с правильными типами
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
 }
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.5 } }
 }
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -58,12 +58,12 @@ const staggerContainer = {
 
 const cardHover = {
   scale: 1.02,
-  transition: { type: "spring", stiffness: 300, damping: 20 }
+  transition: { type: "spring" as const, stiffness: 300, damping: 20 }
 }
 
 const buttonTap = {
   scale: 0.95,
-  transition: { type: "spring", stiffness: 400, damping: 10 }
+  transition: { type: "spring" as const, stiffness: 400, damping: 10 }
 }
 
 export default function HomePage() {
@@ -266,7 +266,7 @@ export default function HomePage() {
                   opacity: [0.3, 0.6, 0.3]
                 }}
                 transition={{ duration: 3, repeat: Infinity }}
-              ></motion.div>
+              />
             </motion.main>
 
             <motion.section 
