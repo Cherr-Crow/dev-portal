@@ -1,0 +1,13 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "rootDirectory": "portfolio-ai",
+  "env": {
+    "DATABASE_URL": "file:/tmp/dev.db",
+    "NEXTAUTH_URL": "https://dev-portal.vercel.app",
+    "NEXTAUTH_SECRET": "5e015372a192c046e578dcb90422846db3d846f842b29a4e21560ba0fdcfcbb2",
+    "AUTH_SECRET": "5e015372a192c046e578dcb90422846db3d846f842b29a4e21560ba0fdcfcbb2"
+  }
+}
