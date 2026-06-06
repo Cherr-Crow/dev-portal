@@ -90,8 +90,6 @@ dev-portal/
 
 ---
 
-## Быстрый старт
-
 ### Требования
 
 - Node.js 18+
@@ -131,6 +129,8 @@ dev-portal/
     <td align="center"><b>1</b></td>
     <td><b>Клонирование репозитория</b></td>
     <td>
+    </tr>
+    </table>
 
 ```bash
 git clone https://github.com/Cherr-Crow/dev-portal.git
