@@ -118,10 +118,12 @@ GITHUB_SECRET=""
 GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
 OPENAI_API_KEY="sk-..."
+
 База данных
 bash
 npx prisma db push
 npm run seed
+
 Запуск
 bash
 npm run dev
