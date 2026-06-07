@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { IoSend, IoSparkles, IoHappy, IoBulb, IoClose } from 'react-icons/io5'
+import { IoSend, IoSparkles, IoHappy, IoBulb, IoClose, IoWarning } from 'react-icons/io5'
 import styles from './Chat.module.css'
 
 interface Message {
@@ -32,6 +32,8 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [showAiPanel, setShowAiPanel] = useState(false)
   const [aiThinking, setAiThinking] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
+  const [sentiment, setSentiment] = useState<'positive' | 'negative' | 'neutral' | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -56,6 +58,7 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
       return
     }
     
+    setAiError(null)
     try {
       const res = await fetch('/api/chat/ai', {
         method: 'POST',
@@ -64,10 +67,29 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
       })
       if (res.ok) {
         const data = await res.json()
-        setAiSuggestions(data.suggestions)
+        setAiSuggestions(data.suggestions || [])
       }
     } catch (error) {
       console.error('Error getting AI suggestions:', error)
+      setAiSuggestions([])
+    }
+  }
+
+  // Анализ тональности сообщения
+  const analyzeSentiment = async (text: string) => {
+    try {
+      const res = await fetch('/api/chat/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, action: 'analyze' })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setSentiment(data.sentiment)
+        setTimeout(() => setSentiment(null), 3000)
+      }
+    } catch (error) {
+      console.error('Error analyzing sentiment:', error)
     }
   }
 
@@ -76,22 +98,36 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
     if (!newMessage.trim()) return
     
     setAiThinking(true)
+    setAiError(null)
     try {
+      const recentMessages = messages.slice(-5).map(msg => ({
+        content: msg.content,
+        senderId: msg.senderId,
+        senderName: msg.senderId === currentUserId ? 'Я' : otherUserName
+      }))
+      
       const res = await fetch('/api/chat/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: newMessage, action: 'smartReply' })
+        body: JSON.stringify({ 
+          message: newMessage, 
+          action: 'smartReply',
+          chatHistory: recentMessages
+        })
       })
       if (res.ok) {
         const data = await res.json()
         setNewMessage(data.reply)
         inputRef.current?.focus()
+      } else {
+        const errorData = await res.json()
+        setAiError(errorData.error || 'Ошибка генерации ответа')
       }
     } catch (error) {
       console.error('Error generating reply:', error)
+      setAiError('Не удалось подключиться к AI сервису')
     } finally {
       setAiThinking(false)
-      setShowAiPanel(false)
     }
   }
 
@@ -114,6 +150,14 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
     }, 500)
     return () => clearTimeout(debounce)
   }, [newMessage])
+
+  // Анализ тональности при получении нового сообщения
+  useEffect(() => {
+    if (messages.length > 0 && messages[messages.length - 1].senderId !== currentUserId) {
+      const lastMessage = messages[messages.length - 1]
+      analyzeSentiment(lastMessage.content)
+    }
+  }, [messages.length])
 
   // Авто-фокус
   useEffect(() => {
@@ -169,6 +213,13 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
     return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
   }
 
+  const getSentimentEmoji = () => {
+    if (sentiment === 'positive') return '😊'
+    if (sentiment === 'negative') return '😟'
+    if (sentiment === 'neutral') return '😐'
+    return null
+  }
+
   return (
     <div className={styles.chatWindowFull}>
       <div className={styles.chatHeader}>
@@ -182,6 +233,11 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
             {otherUserName.charAt(0).toUpperCase()}
           </div>
           <h3>{otherUserName}</h3>
+          {sentiment && (
+            <span className={styles.sentimentIndicator}>
+              {getSentimentEmoji()}
+            </span>
+          )}
         </div>
         <button 
           className={styles.aiButton}
@@ -202,18 +258,19 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
             </button>
           </div>
           <div className={styles.aiPanelContent}>
-            <p>✨ Я помогу вам с ответами!</p>
+            <p>✨ Умный помощник для ваших сообщений!</p>
             <button 
               className={styles.aiActionBtn}
               onClick={generateSmartReply}
               disabled={aiThinking || !newMessage.trim()}
             >
-              {aiThinking ? 'Думаю...' : '✨ Умный ответ'}
+              {aiThinking ? '🤔 Думаю...' : '✨ Умный ответ'}
             </button>
             <button 
               className={styles.aiActionBtn}
               onClick={() => {
                 setNewMessage('Спасибо за ответ! Буду рад сотрудничеству.')
+                inputRef.current?.focus()
               }}
             >
               💼 Шаблон: Благодарность
@@ -221,12 +278,27 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
             <button 
               className={styles.aiActionBtn}
               onClick={() => {
-                setNewMessage('Расскажите подробнее о вашем проекте?')
+                setNewMessage('Расскажите подробнее о вашем проекте? Интересно узнать детали')
+                inputRef.current?.focus()
               }}
             >
               📝 Шаблон: Уточнение
             </button>
+            <button 
+              className={styles.aiActionBtn}
+              onClick={() => {
+                setNewMessage('Когда вам было бы удобно обсудить детали?')
+                inputRef.current?.focus()
+              }}
+            >
+              ⏰ Шаблон: Время встречи
+            </button>
           </div>
+          {aiError && (
+            <div className={styles.aiError}>
+              <IoWarning /> {aiError}
+            </div>
+          )}
         </div>
       )}
       
@@ -237,7 +309,15 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
           <div className={styles.welcomeMessage}>
             <div className={styles.welcomeIcon}>💬</div>
             <p>Напишите первое сообщение</p>
-            <span className={styles.welcomeHint}>Используйте AI помощника для умных ответов</span>
+            <span className={styles.welcomeHint}>
+              Используйте AI помощника для умных ответов
+            </span>
+            <button 
+              className={styles.aiSuggestButton}
+              onClick={() => setShowAiPanel(true)}
+            >
+              <IoSparkles /> Открыть AI помощника
+            </button>
           </div>
         ) : (
           <>
@@ -256,7 +336,7 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
       </div>
       
       {/* AI подсказки при вводе */}
-      {aiSuggestions.length > 0 && (
+      {aiSuggestions.length > 0 && !aiThinking && (
         <div className={styles.aiSuggestionsBar}>
           <IoBulb className={styles.suggestionsIcon} />
           <div className={styles.suggestionsList}>
@@ -290,12 +370,16 @@ export default function ChatWindow({ chatId, otherUserName, currentUserId, onBac
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Введите сообщение... (AI поможет)"
+          placeholder={aiThinking ? "AI думает..." : "Введите сообщение... (AI поможет)"}
           className={styles.messageInput}
-          disabled={sending}
+          disabled={sending || aiThinking}
           autoFocus
         />
-        <button type="submit" disabled={sending || !newMessage.trim()} className={styles.sendButton}>
+        <button 
+          type="submit" 
+          disabled={sending || !newMessage.trim() || aiThinking} 
+          className={styles.sendButton}
+        >
           {sending ? '...' : <IoSend />}
         </button>
       </form>
