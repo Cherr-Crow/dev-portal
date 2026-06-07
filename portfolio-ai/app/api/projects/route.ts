@@ -55,8 +55,8 @@ export async function GET() {
   try {
     const session = await auth()
     
-  
     if (!session || !session.user) {
+      // Для неавторизованных - все проекты
       const allProjects = await prisma.project.findMany({
         include: {
           user: {
@@ -91,10 +91,10 @@ export async function GET() {
         createdAt: p.createdAt,
       }))
 
-      return NextResponse.json({ projects: projectsWithArray })
+      return NextResponse.json(projectsWithArray)
     }
 
- 
+    // Для авторизованных - только свои проекты
     const projects = await prisma.project.findMany({
       where: {
         userId: session.user.id
@@ -109,7 +109,7 @@ export async function GET() {
       techStack: JSON.parse(p.techStack || '[]')
     }))
 
-    return NextResponse.json({ projects: projectsWithArray })
+    return NextResponse.json(projectsWithArray)
     
   } catch (error) {
     console.error('Ошибка получения проектов:', error)

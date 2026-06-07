@@ -1,11 +1,11 @@
-// app/dashboard/page.tsx
+
 import { auth } from "@/auth"
 import { prisma } from "@/app/lib/prisma"
 import DeveloperDashboard from "./components/DeveloperDashboard"
 import EmployerDashboard from "./components/EmployerDashboard"
 import styles from './page.module.css'
 
-// Добавьте типы для пользователя из сессии
+
 interface SessionUser {
   id: string
   name: string | null
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
     )
   }
 
-  // Проверка роли с type guard
+
   const userRole = session.user.role
 
   if (userRole === 'EMPLOYER') {

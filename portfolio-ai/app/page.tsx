@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import styles from './page.module.css'
@@ -34,7 +34,6 @@ interface Developer {
 
 type Page = 'home' | 'projects' | 'developers'
 
-// Анимационные варианты с правильными типами
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
@@ -71,42 +70,81 @@ export default function HomePage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [developers, setDevelopers] = useState<Developer[]>([])
   const [loading, setLoading] = useState(false)
+  const [initialLoaded, setInitialLoaded] = useState(false)
 
-  const fetchProjects = async () => {
-    setLoading(true)
+  const fetchProjects = useCallback(async () => {
     try {
       const res = await fetch('/api/projects')
       const data = await res.json()
-      const list = data.projects || data || []
-      setProjects(Array.isArray(list) ? list : [])
+      
+     
+      let projectsList = []
+      if (Array.isArray(data)) {
+        projectsList = data
+      } else if (data.projects && Array.isArray(data.projects)) {
+        projectsList = data.projects
+      } else if (data.data && Array.isArray(data.data)) {
+        projectsList = data.data
+      }
+      
+      setProjects(projectsList)
     } catch (err) {
       console.error('Ошибка загрузки проектов:', err)
-    } finally {
-      setLoading(false)
+      setProjects([])
     }
-  }
+  }, [])
 
-  const fetchDevelopers = async () => {
-    setLoading(true)
+  const fetchDevelopers = useCallback(async () => {
     try {
       const res = await fetch('/api/developers')
       const data = await res.json()
-      const list = data.developers || data || []
-      setDevelopers(Array.isArray(list) ? list : [])
+      
+   
+      let developersList = []
+      if (Array.isArray(data)) {
+        developersList = data
+      } else if (data.developers && Array.isArray(data.developers)) {
+        developersList = data.developers
+      } else if (data.data && Array.isArray(data.data)) {
+        developersList = data.data
+      }
+      
+      setDevelopers(developersList)
     } catch (err) {
       console.error('Ошибка загрузки разработчиков:', err)
-    } finally {
-      setLoading(false)
+      setDevelopers([])
     }
-  }
+  }, [])
+
+  
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoading(true)
+      await Promise.all([fetchProjects(), fetchDevelopers()])
+      setLoading(false)
+      setInitialLoaded(true)
+    }
+    loadInitialData()
+  }, [fetchProjects, fetchDevelopers])
+
 
   useEffect(() => {
-    if (currentPage === 'projects') fetchProjects()
-    if (currentPage === 'developers') fetchDevelopers()
-  }, [currentPage])
+    if (!initialLoaded) return
+    
+    if (currentPage === 'projects' && projects.length === 0) {
+      fetchProjects()
+    }
+    if (currentPage === 'developers' && developers.length === 0) {
+      fetchDevelopers()
+    }
+  }, [currentPage, projects.length, developers.length, fetchProjects, fetchDevelopers, initialLoaded])
 
   const parseTechStack = (techStack: string): string[] => {
-    try { return JSON.parse(techStack) }
+    if (!techStack) return []
+    try { 
+      const parsed = JSON.parse(techStack)
+      return Array.isArray(parsed) ? parsed : []
+    }
     catch { return [] }
   }
 
@@ -118,8 +156,7 @@ export default function HomePage() {
   return (
     <AnimatePresence mode="wait">
       <div className={styles.landing}>
-     
-        {/* Хедер с анимацией */}
+        {/* Хедер */}
         <motion.header 
           className={styles.header}
           initial={{ y: -100, opacity: 0 }}
@@ -158,10 +195,6 @@ export default function HomePage() {
                   className={`${styles.headerLinkBtn} ${currentPage === page ? styles.headerLinkActive : ''}`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  animate={{
-                    color: currentPage === page ? '#58a6ff' : '#8b949e',
-                    borderBottomColor: currentPage === page ? '#58a6ff' : 'transparent'
-                  }}
                 >
                   {page === 'projects' ? 'Проекты' : 'Разработчики'}
                 </motion.button>
@@ -176,7 +209,7 @@ export default function HomePage() {
           </div>
         </motion.header>
 
-        {/* Главная страница с анимациями */}
+        {/* Главная страница */}
         {currentPage === 'home' && (
           <motion.div
             key="home"
@@ -236,8 +269,8 @@ export default function HomePage() {
                   animate="visible"
                 >
                   {[
-                    { number: '250+', label: 'Проектов' },
-                    { number: '180+', label: 'Разработчиков' },
+                    { number: projects.length.toString() + '+', label: 'Проектов' },
+                    { number: developers.length.toString() + '+', label: 'Разработчиков' },
                     { number: '45+', label: 'Компаний' }
                   ].map((stat, index) => (
                     <motion.div 
@@ -320,7 +353,7 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Страница проектов с анимациями */}
+        
         {currentPage === 'projects' && (
           <motion.section 
             key="projects"
@@ -336,9 +369,6 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <motion.h2 className={styles.pageTitle}>
-                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
-                  <path fillRule="evenodd" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8z"/>
-                </svg>
                 Все проекты 
                 <motion.span 
                   className={styles.countBadge}
@@ -352,7 +382,7 @@ export default function HomePage() {
               <p className={styles.pageSubtitle}>Портфолио разработчиков платформы</p>
             </motion.div>
 
-            {loading ? (
+            {loading && projects.length === 0 ? (
               <motion.div 
                 className={styles.projectsGrid}
                 variants={staggerContainer}
@@ -385,15 +415,6 @@ export default function HomePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: "spring" }}
               >
-                <motion.div 
-                  className={styles.emptyIconWrapper}
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#484f58" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                </motion.div>
                 <h3 className={styles.emptyTitle}>Пока нет проектов</h3>
                 <p className={styles.emptyText}>Разработчики ещё не добавили свои работы. Станьте первым!</p>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -492,7 +513,7 @@ export default function HomePage() {
           </motion.section>
         )}
 
-        {/* Страница разработчиков с анимациями */}
+        {/* Страница разработчиков */}
         {currentPage === 'developers' && (
           <motion.section 
             key="developers"
@@ -508,9 +529,6 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <motion.h2 className={styles.pageTitle}>
-                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.5 3.5a2 2 0 100 4 2 2 0 000-4zM2 5.5a3.5 3.5 0 115.898 2.549 5.507 5.507 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-7.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5z"/>
-                </svg>
                 Все разработчики 
                 <motion.span 
                   className={styles.countBadge}
@@ -524,7 +542,7 @@ export default function HomePage() {
               <p className={styles.pageSubtitle}>Талантливые специалисты на платформе</p>
             </motion.div>
 
-            {loading ? (
+            {loading && developers.length === 0 ? (
               <motion.div 
                 className={styles.developersGrid}
                 variants={staggerContainer}
@@ -559,18 +577,6 @@ export default function HomePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: "spring" }}
               >
-                <motion.div 
-                  className={styles.emptyIconWrapper}
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#484f58" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                  </svg>
-                </motion.div>
                 <h3 className={styles.emptyTitle}>Нет разработчиков</h3>
                 <p className={styles.emptyText}>На платформе пока нет зарегистрированных разработчиков</p>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -676,7 +682,7 @@ export default function HomePage() {
           </motion.section>
         )}
 
-        {/* Футер с анимацией */}
+        {/* Футер */}
         <motion.footer 
           className={styles.footer}
           initial={{ opacity: 0 }}

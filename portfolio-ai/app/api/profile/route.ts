@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { title, bio, location, githubUrl, linkedinUrl, website } = body
 
-   
     const existingProfile = await prisma.profile.findUnique({
       where: { userId: session.user.id }
     })
@@ -40,7 +39,16 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ profile }, { status: 201 })
+    // Возвращаем полного пользователя с профилем
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        profile: true,
+        projects: true
+      }
+    })
+
+    return NextResponse.json({ user, profile }, { status: 201 })
     
   } catch (error) {
     console.error(error)
@@ -62,13 +70,23 @@ export async function GET() {
       )
     }
 
-    const profile = await prisma.profile.findUnique({
-      where: { userId: session.user.id }
+    // Получаем ПОЛНОГО пользователя с профилем и проектами
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        profile: true,
+        projects: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      }
     })
 
-    return NextResponse.json(profile || null)
+    return NextResponse.json({ user })
     
   } catch (error) {
+    console.error(error)
     return NextResponse.json(
       { error: "Ошибка получения профиля" },
       { status: 500 }
@@ -90,19 +108,55 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json()
     const { title, bio, location, githubUrl, linkedinUrl, website } = body
 
-    const profile = await prisma.profile.update({
-      where: { userId: session.user.id },
-      data: {
-        title: title || "",
-        bio: bio || "",
-        location: location || "",
-        githubUrl: githubUrl || "",
-        linkedinUrl: linkedinUrl || "",
-        website: website || "",
+    // Проверяем, существует ли профиль
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId: session.user.id }
+    })
+
+    let profile
+
+    if (!existingProfile) {
+      // Создаем если нет
+      profile = await prisma.profile.create({
+        data: {
+          title: title || "",
+          bio: bio || "",
+          location: location || "",
+          githubUrl: githubUrl || "",
+          linkedinUrl: linkedinUrl || "",
+          website: website || "",
+          userId: session.user.id,
+        }
+      })
+    } else {
+      // Обновляем если есть
+      profile = await prisma.profile.update({
+        where: { userId: session.user.id },
+        data: {
+          title: title !== undefined ? title : existingProfile.title,
+          bio: bio !== undefined ? bio : existingProfile.bio,
+          location: location !== undefined ? location : existingProfile.location,
+          githubUrl: githubUrl !== undefined ? githubUrl : existingProfile.githubUrl,
+          linkedinUrl: linkedinUrl !== undefined ? linkedinUrl : existingProfile.linkedinUrl,
+          website: website !== undefined ? website : existingProfile.website,
+        }
+      })
+    }
+
+    // Возвращаем полного пользователя с обновленным профилем
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        profile: true,
+        projects: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
       }
     })
 
-    return NextResponse.json({ profile })
+    return NextResponse.json({ user, profile })
     
   } catch (error) {
     console.error(error)

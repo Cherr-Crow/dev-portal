@@ -2,27 +2,69 @@
 'use client'
 
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import styles from '../page.module.css'
 
 interface DeveloperDashboardProps {
   user: any
 }
 
-export default function DeveloperDashboard({ user }: DeveloperDashboardProps) {
+export default function DeveloperDashboard({ user: initialUser }: DeveloperDashboardProps) {
+  const [user, setUser] = useState(initialUser)
+  const [loading, setLoading] = useState(false)
+
+  // Функция для обновления данных пользователя
+  const refreshUserData = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch('/api/user/profile')
+      if (res.ok) {
+        const data = await res.json()
+        setUser(data.user)
+      }
+    } catch (error) {
+      console.error('Ошибка обновления данных:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Обновляем данные при монтировании и когда меняется initialUser
+  useEffect(() => {
+    setUser(initialUser)
+  }, [initialUser])
+
+  // Периодически проверяем обновления (опционально)
+  useEffect(() => {
+    // Обновляем данные при возвращении на страницу
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshUserData()
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+
   return (
     <div>
-      {/* Кнопка перехода в чаты - ТАКАЯ ЖЕ КАК У РАБОТОДАТЕЛЯ */}
-      <div className={styles.chatNavButton}>
-        <Link href="/dashboard/chats" className={styles.allChatsButton}>
-          💬 Все чаты
-        </Link>
-      </div>
+  
+
+     
 
       {/* Профиль */}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Профиль разработчика</h2>
-          <Link href="/dashboard/profile" className={styles.editLink}>
+          <Link 
+            href="/dashboard/profile" 
+            className={styles.editLink}
+            onClick={() => {
+              
+              sessionStorage.setItem('needRefresh', 'true')
+            }}
+          >
             Редактировать
           </Link>
         </div>

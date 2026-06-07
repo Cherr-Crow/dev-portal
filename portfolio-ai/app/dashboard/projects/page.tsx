@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import styles from './page.module.css'
@@ -30,15 +31,30 @@ export default function ProjectsPage() {
         },
       })
       
-      const data = await res.json()
-      
       if (!res.ok) {
-        throw new Error(data.message || data.error || 'Ошибка загрузки')
+        const data = await res.json()
+        throw new Error(data.error || data.message || 'Ошибка загрузки')
       }
       
-      const projectList = data.projects || data.data || data || []
-      setProjects(Array.isArray(projectList) ? projectList : [])
+      const data = await res.json()
+      const projectList = Array.isArray(data) ? data : []
+      
+      // Форматируем проекты для компонента
+      const formattedProjects = projectList.map((project: any) => ({
+        id: project.id,
+        title: project.title,
+        description: project.description || '',
+        techStack: Array.isArray(project.techStack) 
+          ? JSON.stringify(project.techStack) 
+          : (project.techStack || '[]'),
+        demoUrl: project.demoUrl || '',
+        repoUrl: project.repoUrl || '',
+        createdAt: project.createdAt
+      }))
+      
+      setProjects(formattedProjects)
     } catch (err: any) {
+      console.error('Fetch error:', err)
       setError(err.message || 'Не удалось загрузить проекты')
     } finally {
       setLoading(false)
@@ -61,19 +77,29 @@ export default function ProjectsPage() {
   }, [fetchProjects])
 
   const deleteProject = async (id: string, title: string) => {
-    if (!confirm(`Вы уверены, что хотите удалить проект "${title}"? Это действие нельзя отменить.`)) return
+    if (!confirm(`Вы уверены, что хотите удалить проект "${title}"? Это действие нельзя отменить.`)) {
+      return
+    }
     
     try {
-      const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/projects/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      const data = await res.json()
       
       if (res.ok) {
-        setProjects(projects.filter(p => p.id !== id))
+        setProjects(prevProjects => prevProjects.filter(p => p.id !== id))
+        alert('Проект успешно удален!')
       } else {
-        const data = await res.json()
-        alert(data.message || 'Ошибка при удалении')
+        alert(data.error || data.message || 'Ошибка при удалении')
       }
     } catch (err) {
-      alert('Ошибка при удалении')
+      console.error('Delete error:', err)
+      alert('Ошибка при удалении. Попробуйте еще раз.')
     }
   }
 
@@ -132,7 +158,6 @@ export default function ProjectsPage() {
 
   return (
     <div className={styles.section}>
-      {/* Заголовок */}
       <div className={styles.sectionHeader}>
         <div>
           <h2 className={styles.sectionTitle}>
@@ -158,7 +183,6 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Пустое состояние */}
       {projects.length === 0 ? (
         <div className={styles.emptyState}>
           <div className={styles.emptyIllustration}>
@@ -185,11 +209,9 @@ export default function ProjectsPage() {
         <div className={styles.projectsGrid}>
           {projects.map((project) => (
             <div key={project.id} className={styles.projectCard}>
-              {/* Верхняя цветная полоска */}
               <div className={styles.projectCardAccent}></div>
               
               <div className={styles.projectCardBody}>
-                {/* Заголовок с иконкой */}
                 <div className={styles.projectCardHeader}>
                   <div className={styles.projectIcon}>
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
@@ -201,12 +223,10 @@ export default function ProjectsPage() {
                   </div>
                 </div>
                 
-                {/* Описание */}
                 <p className={styles.projectCardDescription}>
                   {project.description || 'Описание отсутствует'}
                 </p>
 
-                {/* Технологии */}
                 {project.techStack && parseTechStack(project.techStack).length > 0 && (
                   <div className={styles.techStackWrapper}>
                     {parseTechStack(project.techStack).map((tech: string) => (
@@ -217,7 +237,6 @@ export default function ProjectsPage() {
                   </div>
                 )}
 
-                {/* Нижняя панель */}
                 <div className={styles.projectCardFooter}>
                   <div className={styles.projectLinks}>
                     {project.repoUrl && (
@@ -248,7 +267,7 @@ export default function ProjectsPage() {
                     )}
                   </div>
                   <button 
-                    onClick={() => deleteProject(project.id, project.title)} 
+                    onClick={() => deleteProject(project.id, project.title)}
                     className={styles.deleteButton}
                     title="Удалить проект"
                   >
